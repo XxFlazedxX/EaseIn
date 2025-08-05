@@ -1,0 +1,181 @@
+local player = game.Players.LocalPlayer
+local runService = game:GetService("RunService")
+
+-- GUI Setup
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "AzraMacroGUI"
+gui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 160, 0, 110)
+frame.Position = UDim2.new(0, 30, 0, 150)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+-- Close/Open Button (Draggable)
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.new(0, 30, 0, 30)
+toggleBtn.Position = UDim2.new(0, frame.Position.X.Offset + frame.Size.X.Offset + 5, 0, frame.Position.Y.Offset)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
+toggleBtn.Text = "-"
+toggleBtn.TextColor3 = Color3.new(1, 1, 1)
+toggleBtn.Font = Enum.Font.FredokaOne
+toggleBtn.TextScaled = true
+toggleBtn.Draggable = true
+
+-- Title
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 20)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Made By Hanan"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.Fantasy
+title.TextScaled = true
+
+-- Macro Button
+local macroBtn = Instance.new("TextButton", frame)
+macroBtn.Size = UDim2.new(1, -10, 0, 30)
+macroBtn.Position = UDim2.new(0, 5, 0, 30)
+macroBtn.Text = "Macro: OFF"
+macroBtn.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
+macroBtn.TextColor3 = Color3.new(1, 1, 1)
+macroBtn.Font = Enum.Font.FredokaOne
+macroBtn.TextScaled = true
+
+-- EaseIn Button
+local easeBtn = Instance.new("TextButton", frame)
+easeBtn.Size = UDim2.new(1, -10, 0, 30)
+easeBtn.Position = UDim2.new(0, 5, 0, 70)
+easeBtn.Text = "EaseIn: OFF"
+easeBtn.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
+easeBtn.TextColor3 = Color3.new(1, 1, 1)
+easeBtn.Font = Enum.Font.FredokaOne
+easeBtn.TextScaled = true
+
+-- Static Corner Flowers 🌸
+local corners = {
+	UDim2.new(0, 0, 0, 0),
+	UDim2.new(1, -20, 0, 0),
+	UDim2.new(0, 0, 1, -20),
+	UDim2.new(1, -20, 1, -20),
+}
+
+for _, pos in ipairs(corners) do
+	local flower = Instance.new("TextLabel", frame)
+	flower.Size = UDim2.new(0, 20, 0, 20)
+	flower.Position = pos
+	flower.BackgroundTransparency = 1
+	flower.Text = "🌸"
+	flower.TextScaled = true
+	flower.TextColor3 = Color3.fromRGB(255, 182, 193)
+	flower.Font = Enum.Font.GothamSemibold
+end
+
+-- Animated Flower 🌸
+local animatedFlower = Instance.new("TextLabel", frame)
+animatedFlower.Size = UDim2.new(0, 20, 0, 20)
+animatedFlower.BackgroundTransparency = 1
+animatedFlower.Text = "🌸"
+animatedFlower.TextScaled = true
+animatedFlower.TextColor3 = Color3.fromRGB(255, 182, 193)
+animatedFlower.Font = Enum.Font.GothamSemibold
+
+local side = 1
+local step = 0
+local sides = {"Top", "Right", "Bottom", "Left"}
+
+runService.RenderStepped:Connect(function()
+	if not frame.Visible then return end
+	local w, h = frame.AbsoluteSize.X, frame.AbsoluteSize.Y
+
+	if sides[side] == "Top" then
+		animatedFlower.Position = UDim2.new(0, step, 0, -10)
+		step += 1
+		if step > w then step = 0 side = 2 end
+	elseif sides[side] == "Right" then
+		animatedFlower.Position = UDim2.new(0, w, 0, step)
+		step += 1
+		if step > h then step = 0 side = 3 end
+	elseif sides[side] == "Bottom" then
+		animatedFlower.Position = UDim2.new(0, w - step, 0, h)
+		step += 1
+		if step > w then step = 0 side = 4 end
+	elseif sides[side] == "Left" then
+		animatedFlower.Position = UDim2.new(0, -10, 0, h - step)
+		step += 1
+		if step > h then step = 0 side = 1 end
+	end
+
+	toggleBtn.Position = UDim2.new(0, frame.Position.X.Offset + frame.Size.X.Offset + 5, 0, frame.Position.Y.Offset)
+end)
+
+-- Sound Effect
+local sound = Instance.new("Sound", gui)
+sound.SoundId = "rbxassetid://9118823106"
+sound.Volume = 1
+
+-- ⛓️ Macro + EaseIn Logic from YOUR script
+local isEaseInActive = false
+local isPulling = false
+local pulledOnce = false
+local speed = 27
+
+-- Get rope
+local function getRope()
+	local ropesFolder = workspace:FindFirstChild("Ropes")
+	if not ropesFolder then return nil end
+	local userRope = ropesFolder:FindFirstChild(player.Name)
+	if not userRope then return nil end
+	return userRope:FindFirstChild("mainConnectionRope")
+end
+
+-- EaseIn button logic
+easeBtn.MouseButton1Click:Connect(function()
+	sound:Play()
+	isEaseInActive = not isEaseInActive
+	easeBtn.Text = isEaseInActive and "EaseIn: ON" or "EaseIn: OFF"
+	local rope = getRope()
+	if rope and isEaseInActive then
+		rope.Length = 50
+	end
+end)
+
+-- Macro button logic
+macroBtn.MouseButton1Click:Connect(function()
+	sound:Play()
+	isPulling = not isPulling
+	pulledOnce = isPulling or pulledOnce
+	macroBtn.Text = isPulling and "Pull: ON" or "Throw: OFF"
+end)
+
+-- Main loop
+runService.RenderStepped:Connect(function(dt)
+	local rope = getRope()
+	if rope then
+		if isEaseInActive then
+			rope.Length = math.max(rope.Length - speed * dt, 5)
+			if rope.Length <= 5 then
+				isEaseInActive = false
+				easeBtn.Text = "EaseIn: OFF"
+			end
+		else
+			if isPulling then
+				rope.Length = 5
+			elseif pulledOnce then
+				rope.Length = 999999999
+			end
+		end
+	end
+end)
+
+-- Open/Close Logic
+local guiVisible = true
+toggleBtn.MouseButton1Click:Connect(function()
+	guiVisible = not guiVisible
+	frame.Visible = guiVisible
+	toggleBtn.Text = guiVisible and "-" or "+"
+	sound:Play()
+end)
