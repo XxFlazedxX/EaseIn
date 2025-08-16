@@ -3,7 +3,7 @@ local runService = game:GetService("RunService")
 
 -- GUI Setup
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "AzraMacroGUI"
+gui.Name = "HananMacroGUI"
 gui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", gui)
@@ -49,7 +49,7 @@ macroBtn.TextScaled = true
 local easeBtn = Instance.new("TextButton", frame)
 easeBtn.Size = UDim2.new(1, -10, 0, 30)
 easeBtn.Position = UDim2.new(0, 5, 0, 70)
-easeBtn.Text = "EaseIn: OFF"
+easeBtn.Text = "Closed"
 easeBtn.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
 easeBtn.TextColor3 = Color3.new(1, 1, 1)
 easeBtn.Font = Enum.Font.FredokaOne
@@ -136,10 +136,10 @@ end
 easeBtn.MouseButton1Click:Connect(function()
 	sound:Play()
 	isEaseInActive = not isEaseInActive
-	easeBtn.Text = isEaseInActive and "EaseIn: ON" or "EaseIn: OFF"
+	easeBtn.Text = isEaseInActive and "Closed" or "Closed"
 	local rope = getRope()
 	if rope and isEaseInActive then
-		rope.Length = 50
+		rope.Length = 5
 	end
 end)
 
@@ -159,7 +159,7 @@ runService.RenderStepped:Connect(function(dt)
 			rope.Length = math.max(rope.Length - speed * dt, 5)
 			if rope.Length <= 5 then
 				isEaseInActive = false
-				easeBtn.Text = "EaseIn: OFF"
+				easeBtn.Text = "Closed"
 			end
 		else
 			if isPulling then
